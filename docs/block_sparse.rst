@@ -11,4 +11,6 @@ Documentation for the regrnd model class.
 .. autoclass:: symmetric_block_sparse
     :members:
 
+.. autofunction:: matmul
+
 .. autofunction:: dense_to_block_sparse

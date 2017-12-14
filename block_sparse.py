@@ -313,82 +313,21 @@ class block_sparse(object):
         return self.add(A)
 
     def dot(self,A):
-        return matmul(self,A)
+        """Right multiply the current matrix with another :class:`block_sparse` matrix, :class:`symmetric_block_sparse` matrix, or
+        :class:`~numpy:numpy.array`, A.
 
-    # def dot(self, A):
-    #     """Right multiply the current matrix with another :class:`block_sparse` matrix, or :class:`symmetric_block_sparse` matrix, A.
-    #
-    #         Parameters
-    #         ----------
-    #         A : matrix
-    #             matrix A with compatible dimensions and block structure: i.e. the row blocks of A must match the column blocks of the
-    #             current matrix. The matrix A can be a :class:`block_sparse` matrix, or a :class:`symmetric_block_sparse` matrix.
-    #
-    #         Returns
-    #         -------
-    #         :class:`block_sparse`
-    #             the block-sparse matrix formed by right multiplication of the current matrix by A
-    #     """
-    #     # matrix multiplication: B=self%*%A
-    #     if not type(A) in [block_sparse, symmetric_block_sparse]:
-    #         raise (ValueError('Other matrix is not block_sparse'))
-    #     if not self.n_blocks[1] == A.n_blocks[0]:
-    #         raise (ValueError('Number of col blocks of first matrix not equal to number of row blocks of second'))
-    #     for i in xrange(0, self.n_blocks[1]):
-    #         if not self.blocks[1][i] == A.blocks[0][i]:
-    #             raise (ValueError(
-    #                 'self col block boundary at ' + str(self.blocks[1][i]) + ' and A row block boundary at ' + str(
-    #                     A.blocks[0][i])))
-    #     if self.submatrices is None or np.sum(self.nonzero) == 0 or A.submatrices is None or np.sum(A.nonzero) == 0:
-    #         return block_sparse([self.blocks[0], A.blocks[1]], np.zeros((self.n_blocks[0], A.n_blocks[1]), dtype=bool),
-    #                             [])
-    #     if not self.dtype == A.dtype:
-    #         raise (Warning('Data types do not match: ' + str(self.dtype)))
-    #     else:
-    #         # Determine which blocks in product will be non-zero
-    #         B_nonzero = self.nonzero.dot(A.nonzero)
-    #         B_submatrices = list()
-    #         B_blocks = [self.blocks[0], A.blocks[1]]
-    #         for i in xrange(0, self.n_blocks[0]):
-    #             for j in xrange(0, A.n_blocks[1]):
-    #                 if B_nonzero[i, j]:
-    #                     # Identify if resulting i,j submatrix should be block sparse
-    #                     B_ij = np.zeros(
-    #                         (self.blocks[0][i + 1] - self.blocks[0][i], A.blocks[1][j + 1] - A.blocks[1][j]),
-    #                         dtype=self.dtype)
-    #                     for k in xrange(0, self.n_blocks[1]):
-    #                         if self.nonzero[i, k] and A.nonzero[k, j]:
-    #                             self_ik = self.get_submatrix((i, k))
-    #                             A_kj = A.get_submatrix((k, j))
-    #                             if type(self_ik) in [block_sparse, symmetric_block_sparse]:
-    #                                 if type(A_kj) not in [block_sparse, symmetric_block_sparse]:
-    #                                     A_kj = dense_to_block_sparse(A_kj, [self_ik.blocks[1], self_ik.blocks[0]],
-    #                                                                  False, dtype=A_kj.dtype)
-    #                                     B_ijk = self_ik.dot(A_kj)
-    #                                     B_ij = B_ijk.add(B_ij)
-    #                                 B_ijk = self_ik.dot(A_kj)
-    #                                 if not B_ijk.shape == B_ij.shape:
-    #                                     raise (ValueError(
-    #                                         'Block ' + str(i) + ',' + str(j) + ' should have shape ' + str(
-    #                                             self.blocks[0][i + 1] - self.blocks[0][i]) + ',' + str(
-    #                                             A.blocks[1][j + 1] - A.blocks[1][j]) + '.  B_ijk has shape ' + str(
-    #                                             B_ijk.shape[0]) + ',' + str(B_ijk.shape[1]) + ' k=' + str(
-    #                                             k) + ' i=' + str(i) + ' j=' + str(j) + ' self has shape ' + str(
-    #                                             self_ik.shape[0]) + ',' + str(self_ik.shape[1]) + ' A has shape ' + str(
-    #                                             A_kj.shape[0]) + ',' + str(A_kj.shape[1])))
-    #                                 B_ij = B_ijk.add(B_ij)
-    #                             else:
-    #                                 if type(A_kj) in [block_sparse, symmetric_block_sparse]:
-    #                                     self_ik = dense_to_block_sparse(self_ik, A_kj.blocks, False, dtype=A_kj.dtype)
-    #                                     B_ij = self_ik.dot(A_kj).add(B_ij)
-    #                                 else:
-    #                                     if type(B_ij) == np.ndarray:
-    #                                         B_ij += np.dot(self_ik, A_kj)
-    #                                     else:
-    #                                         B_ij = B_ij.add(np.dot(self_ik, A_kj))
-    #                     B_submatrices.append(B_ij)
-    #
-    #         return block_sparse(B_blocks, B_nonzero, B_submatrices)
+         Parameters
+         ----------
+         A : matrix
+             matrix A with compatible dimensions and block structure: i.e. the row blocks of A must match the column blocks of the
+             current matrix, unless A is an :class:`~numpy:numpy.array`.
+
+         Returns
+         -------
+         :class:`block_sparse`
+             the block-sparse matrix formed by right multiplication of the current matrix by A
+        """
+        return matmul(self,A)
 
     def qform(self, y, z=None):
         """Computes quadratic form defined by current matrix and input vectors. Let X be the current :class:`block_sparse` matrix, and y and z column vectors. When it is defined, this computes the quadratic form y'Xz.
@@ -792,7 +731,7 @@ def dense_to_block_sparse(dense, blocks, symmetric, dtype=np.float64):
 
 def matmul(X, A):
     """Matrix multiplication between :class:`block_sparse` and :class:`symmetric_block_sparse` matrices, as well
-        as :class:`~numpy:numpy.array`.
+        as matrix multiplication between a :class:`block_sparse` or :class:`symmetric_block_sparse` matrix and an :class:`~numpy:numpy.array`.
 
         Parameters
         ----------

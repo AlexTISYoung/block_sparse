@@ -3,7 +3,7 @@ import numpy as np
 
 precision = 5
 
-n_per_test = 10**4
+n_per_test = 10**3
 
 from numpy import testing
 def dense_and_block(row_blocks,col_blocks,symmetrical=False,nonzeros=None):
