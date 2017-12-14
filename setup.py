@@ -26,7 +26,7 @@ setup(name='block_sparse',
             'Programming Language :: Python :: 2.7',
       ],
       keywords='sparse linear algebra matrices',
-      packages=['block_sparse'],
+      packages=['.'],
       install_requires=[
             'numpy',
         ],
