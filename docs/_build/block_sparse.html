@@ -1,0 +1,692 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Documentation for ‘block_sparse’ module &#8212; block_sparse 1.2.0a1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.2.0a1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Tutorial" href="tutorial.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="documentation-for-block-sparse-module">
+<h1>Documentation for ‘block_sparse’ module<a class="headerlink" href="#documentation-for-block-sparse-module" title="Permalink to this headline">¶</a></h1>
+<p>Documentation for the regrnd model class.</p>
+<span class="target" id="module-block_sparse"></span><dl class="class">
+<dt id="block_sparse.block_sparse">
+<em class="property">class </em><code class="descclassname">block_sparse.</code><code class="descname">block_sparse</code><span class="sig-paren">(</span><em>blocks</em>, <em>nonzero</em>, <em>submatrices</em>, <em>dtype=&lt;type 'numpy.float32'&gt;</em>, <em>row_names=None</em>, <em>col_names=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/block_sparse.html#block_sparse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#block_sparse.block_sparse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define a block-sparse matrix</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>blocks</strong> : <code class="xref py py-class docutils literal"><span class="pre">list</span></code></p>
+<blockquote>
+<div><p>list of [row_block_boundaries,col_block_boundaries], where each of row_block_boundaries and col_block_boundaries is
+a 1D <code class="xref py py-class docutils literal"><span class="pre">array</span></code> of integers, beginning with 0, followed by the end boundaries of each block in increasing order</p>
+</div></blockquote>
+<p><strong>nonzero</strong> : <code class="xref py py-class docutils literal"><span class="pre">array</span></code></p>
+<blockquote>
+<div><p>boolean numpy array with number of rows equal to number of row blocks, and number of columns equal to number of
+col blocks. If entry [i,j] of nonzero is True, then the corresponding block is non-zero; if it is False, then the
+corresponding block is zero.</p>
+</div></blockquote>
+<p><strong>submatrices</strong> : <code class="xref py py-class docutils literal"><span class="pre">list</span></code></p>
+<blockquote>
+<div><p>list of submatrices for non-zero blocks in row-major order; e.g., block (1,1), (1,2), (2,1), (2,2),…
+Each submatrix can be an <code class="xref py py-class docutils literal"><span class="pre">array</span></code>, a <a class="reference internal" href="#module-block_sparse" title="block_sparse"><code class="xref py py-class docutils literal"><span class="pre">block_sparse</span></code></a> matrix, or a <a class="reference internal" href="#block_sparse.symmetric_block_sparse" title="block_sparse.symmetric_block_sparse"><code class="xref py py-class docutils literal"><span class="pre">symmetric_block_sparse</span></code></a> matrix.</p>
+</div></blockquote>
+<p><strong>dtype</strong> : numpy data type object</p>
+<blockquote>
+<div><p>Set the default data type for the submatrices. Default <code class="xref py py-class docutils literal"><span class="pre">float32</span></code></p>
+</div></blockquote>
+<p><strong>row_names</strong> : <code class="xref py py-class docutils literal"><span class="pre">array</span></code></p>
+<blockquote>
+<div><p>numpy array with names of the row-blocks. Default <code class="xref py py-class docutils literal"><span class="pre">None</span></code></p>
+</div></blockquote>
+<p><strong>col_names</strong> : <code class="xref py py-class docutils literal"><span class="pre">array</span></code></p>
+<blockquote>
+<div><p>numpy array with names of the col-blocks. Default <code class="xref py py-class docutils literal"><span class="pre">None</span></code></p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>matrix</strong> : <a class="reference internal" href="#module-block_sparse" title="block_sparse"><code class="xref py py-class docutils literal"><span class="pre">block_sparse</span></code></a></p>
+<blockquote class="last">
+<div><p>block-sparse matrix</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#block_sparse.block_sparse.add" title="block_sparse.block_sparse.add"><code class="xref py py-obj docutils literal"><span class="pre">add</span></code></a>(A)</td>
+<td>Matrix addition of a matrix A to current matrix</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#block_sparse.block_sparse.dot" title="block_sparse.block_sparse.dot"><code class="xref py py-obj docutils literal"><span class="pre">dot</span></code></a>(A)</td>
+<td>Right multiply the current matrix with another <a class="reference internal" href="#module-block_sparse" title="block_sparse"><code class="xref py py-class docutils literal"><span class="pre">block_sparse</span></code></a> matrix, <a class="reference internal" href="#block_sparse.symmetric_block_sparse" title="block_sparse.symmetric_block_sparse"><code class="xref py py-class docutils literal"><span class="pre">symmetric_block_sparse</span></code></a> matrix, or <code class="xref py py-class docutils literal"><span class="pre">array</span></code>, A.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#block_sparse.block_sparse.frobenius" title="block_sparse.block_sparse.frobenius"><code class="xref py py-obj docutils literal"><span class="pre">frobenius</span></code></a>(A)</td>
+<td>Compute the frobenius inner product between the current matrix and matrix A</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#block_sparse.block_sparse.get_submatrix" title="block_sparse.block_sparse.get_submatrix"><code class="xref py py-obj docutils literal"><span class="pre">get_submatrix</span></code></a>(block)</td>
+<td>Retrieve a particular block of the matrix</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#block_sparse.block_sparse.get_type" title="block_sparse.block_sparse.get_type"><code class="xref py py-obj docutils literal"><span class="pre">get_type</span></code></a>(block)</td>
+<td>Retrieve the type of a particular block of the matrix</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#block_sparse.block_sparse.norm" title="block_sparse.block_sparse.norm"><code class="xref py py-obj docutils literal"><span class="pre">norm</span></code></a>()</td>
+<td>Compute the frobenius norm of the current matrix</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#block_sparse.block_sparse.qform" title="block_sparse.block_sparse.qform"><code class="xref py py-obj docutils literal"><span class="pre">qform</span></code></a>(y[,&nbsp;z])</td>
+<td>Computes quadratic form defined by current matrix and input vectors.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#block_sparse.block_sparse.to_dense" title="block_sparse.block_sparse.to_dense"><code class="xref py py-obj docutils literal"><span class="pre">to_dense</span></code></a>()</td>
+<td>Return the current matrix as a standard (dense) numpy array</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#block_sparse.block_sparse.transpose" title="block_sparse.block_sparse.transpose"><code class="xref py py-obj docutils literal"><span class="pre">transpose</span></code></a>()</td>
+<td>Return the transpose of the block-sparse matrix</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="block_sparse.block_sparse.add">
+<code class="descname">add</code><span class="sig-paren">(</span><em>A</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/block_sparse.html#block_sparse.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#block_sparse.block_sparse.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Matrix addition of a matrix A to current matrix</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>A</strong> : matrix</p>
+<blockquote>
+<div><p>matrix A with same dimensions as current matrix. The matrix A can be an <code class="xref py py-class docutils literal"><span class="pre">array</span></code>,
+<a class="reference internal" href="#module-block_sparse" title="block_sparse"><code class="xref py py-class docutils literal"><span class="pre">block_sparse</span></code></a> matrix, or <a class="reference internal" href="#block_sparse.symmetric_block_sparse" title="block_sparse.symmetric_block_sparse"><code class="xref py py-class docutils literal"><span class="pre">symmetric_block_sparse</span></code></a> matrix. It must have the same block
+structure as the current matrix if the matrix is a <a class="reference internal" href="#module-block_sparse" title="block_sparse"><code class="xref py py-class docutils literal"><span class="pre">block_sparse</span></code></a> matrix or <a class="reference internal" href="#block_sparse.symmetric_block_sparse" title="block_sparse.symmetric_block_sparse"><code class="xref py py-class docutils literal"><span class="pre">symmetric_block_sparse</span></code></a> matrix.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><a class="reference internal" href="#module-block_sparse" title="block_sparse"><code class="xref py py-class docutils literal"><span class="pre">block_sparse</span></code></a></p>
+<blockquote class="last">
+<div><p>the block-sparse matrix formed by matrix addition of the current matrix to A</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="block_sparse.block_sparse.dot">
+<code class="descname">dot</code><span class="sig-paren">(</span><em>A</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/block_sparse.html#block_sparse.dot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#block_sparse.block_sparse.dot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Right multiply the current matrix with another <a class="reference internal" href="#module-block_sparse" title="block_sparse"><code class="xref py py-class docutils literal"><span class="pre">block_sparse</span></code></a> matrix, <a class="reference internal" href="#block_sparse.symmetric_block_sparse" title="block_sparse.symmetric_block_sparse"><code class="xref py py-class docutils literal"><span class="pre">symmetric_block_sparse</span></code></a> matrix, or
+<code class="xref py py-class docutils literal"><span class="pre">array</span></code>, A.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>A</strong> : matrix</p>
+<blockquote>
+<div><p>matrix A with compatible dimensions and block structure: i.e. the row blocks of A must match the column blocks of the
+current matrix, unless A is an <code class="xref py py-class docutils literal"><span class="pre">array</span></code>.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><a class="reference internal" href="#module-block_sparse" title="block_sparse"><code class="xref py py-class docutils literal"><span class="pre">block_sparse</span></code></a></p>
+<blockquote class="last">
+<div><p>the block-sparse matrix formed by right multiplication of the current matrix by A</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="block_sparse.block_sparse.frobenius">
+<code class="descname">frobenius</code><span class="sig-paren">(</span><em>A</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/block_sparse.html#block_sparse.frobenius"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#block_sparse.block_sparse.frobenius" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the frobenius inner product between the current matrix and matrix A</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>A</strong> : matrix</p>
+<blockquote>
+<div><p>matrix A with same dimensions as current matrix. The matrix A can be an <code class="xref py py-class docutils literal"><span class="pre">array</span></code>,
+<a class="reference internal" href="#module-block_sparse" title="block_sparse"><code class="xref py py-class docutils literal"><span class="pre">block_sparse</span></code></a> matrix, or <a class="reference internal" href="#block_sparse.symmetric_block_sparse" title="block_sparse.symmetric_block_sparse"><code class="xref py py-class docutils literal"><span class="pre">symmetric_block_sparse</span></code></a> matrix. It must have the same block
+structure as the current matrix if the matrix is a <a class="reference internal" href="#module-block_sparse" title="block_sparse"><code class="xref py py-class docutils literal"><span class="pre">block_sparse</span></code></a> matrix or <a class="reference internal" href="#block_sparse.symmetric_block_sparse" title="block_sparse.symmetric_block_sparse"><code class="xref py py-class docutils literal"><span class="pre">symmetric_block_sparse</span></code></a> matrix.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></a></p>
+<blockquote class="last">
+<div><p>the frobenius inner product between the current matrix and matrix A</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="block_sparse.block_sparse.get_submatrix">
+<code class="descname">get_submatrix</code><span class="sig-paren">(</span><em>block</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/block_sparse.html#block_sparse.get_submatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#block_sparse.block_sparse.get_submatrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve a particular block of the matrix</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>block</strong> : <code class="xref py py-class docutils literal"><span class="pre">tuple</span></code></p>
+<blockquote>
+<div><p>tuple (i,j) giving the index of the block</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">block</p>
+<blockquote class="last">
+<div><p>either an <code class="xref py py-class docutils literal"><span class="pre">array</span></code>, a <a class="reference internal" href="#module-block_sparse" title="block_sparse"><code class="xref py py-class docutils literal"><span class="pre">block_sparse</span></code></a> matrix, or a <a class="reference internal" href="#block_sparse.symmetric_block_sparse" title="block_sparse.symmetric_block_sparse"><code class="xref py py-class docutils literal"><span class="pre">symmetric_block_sparse</span></code></a> matrix.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="block_sparse.block_sparse.get_type">
+<code class="descname">get_type</code><span class="sig-paren">(</span><em>block</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/block_sparse.html#block_sparse.get_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#block_sparse.block_sparse.get_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the type of a particular block of the matrix</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>block</strong> : <code class="xref py py-class docutils literal"><span class="pre">tuple</span></code></p>
+<blockquote>
+<div><p>tuple (i,j) giving the index of the block</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">block type</p>
+<blockquote class="last">
+<div><p>either <code class="xref py py-class docutils literal"><span class="pre">array</span></code>, <a class="reference internal" href="#module-block_sparse" title="block_sparse"><code class="xref py py-class docutils literal"><span class="pre">block_sparse</span></code></a>, or <a class="reference internal" href="#block_sparse.symmetric_block_sparse" title="block_sparse.symmetric_block_sparse"><code class="xref py py-class docutils literal"><span class="pre">symmetric_block_sparse</span></code></a>.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="block_sparse.block_sparse.norm">
+<code class="descname">norm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/block_sparse.html#block_sparse.norm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#block_sparse.block_sparse.norm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the frobenius norm of the current matrix</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></a></p>
+<blockquote class="last">
+<div><p>the frobenius norm of the current matrix</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="block_sparse.block_sparse.qform">
+<code class="descname">qform</code><span class="sig-paren">(</span><em>y</em>, <em>z=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/block_sparse.html#block_sparse.qform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#block_sparse.block_sparse.qform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes quadratic form defined by current matrix and input vectors. Let X be the current <a class="reference internal" href="#module-block_sparse" title="block_sparse"><code class="xref py py-class docutils literal"><span class="pre">block_sparse</span></code></a> matrix, and y and z column vectors. When it is defined, this computes the quadratic form y’Xz.
+If only y is provided, this computes the quadratic form y’Xy.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>y</strong> : <code class="xref py py-class docutils literal"><span class="pre">array</span></code></p>
+<blockquote>
+<div><blockquote>
+<div><p>1D numpy array of same length as number of rows of current matrix</p>
+</div></blockquote>
+<dl class="docutils">
+<dt>z <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">array</span></code></span></dt>
+<dd><p class="first last">1D numpy array of same length as number of rows of current matrix. Default <code class="xref py py-class docutils literal"><span class="pre">None</span></code>.</p>
+</dd>
+</dl>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></a></p>
+<blockquote class="last">
+<div><p>the value of the quadratic form y’Xz</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="block_sparse.block_sparse.to_dense">
+<code class="descname">to_dense</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/block_sparse.html#block_sparse.to_dense"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#block_sparse.block_sparse.to_dense" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the current matrix as a standard (dense) numpy array</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">array</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="block_sparse.block_sparse.transpose">
+<code class="descname">transpose</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/block_sparse.html#block_sparse.transpose"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#block_sparse.block_sparse.transpose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the transpose of the block-sparse matrix</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="#module-block_sparse" title="block_sparse"><code class="xref py py-class docutils literal"><span class="pre">block_sparse</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="block_sparse.symmetric_block_sparse">
+<em class="property">class </em><code class="descclassname">block_sparse.</code><code class="descname">symmetric_block_sparse</code><span class="sig-paren">(</span><em>blocks</em>, <em>nonzero</em>, <em>submatrices</em>, <em>dtype=&lt;type 'numpy.float32'&gt;</em>, <em>row_names=None</em>, <em>col_names=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/block_sparse.html#symmetric_block_sparse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#block_sparse.symmetric_block_sparse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define a symmetric block-sparse matrix. Inherits some methods from <a class="reference internal" href="#module-block_sparse" title="block_sparse"><code class="xref py py-class docutils literal"><span class="pre">block_sparse</span></code></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>blocks</strong> : <code class="xref py py-class docutils literal"><span class="pre">array</span></code></p>
+<blockquote>
+<div><p>1D numpy integer array, starting at zero, followed by block boundaries, which are the same for both rows and columns</p>
+</div></blockquote>
+<p><strong>nonzero</strong> : <code class="xref py py-class docutils literal"><span class="pre">array</span></code></p>
+<blockquote>
+<div><p>symmetric boolean numpy array with number of rows equal to number of row blocks, which is equal to the number of col blocks.
+If entry [i,j] of nonzero is True, then the corresponding block is non-zero; if it is False, then the corresponding block is zero.</p>
+</div></blockquote>
+<p><strong>submatrices</strong> : <code class="xref py py-class docutils literal"><span class="pre">list</span></code></p>
+<blockquote>
+<div><p>list of submatrices for non-zero blocks in row-major order, ignoring lower-triangular blocks; e.g., block (1,1), (1,2), (2,2),…
+Each submatrix can be a <code class="xref py py-class docutils literal"><span class="pre">array</span></code>, a <a class="reference internal" href="#module-block_sparse" title="block_sparse"><code class="xref py py-class docutils literal"><span class="pre">block_sparse</span></code></a> matrix, or a <a class="reference internal" href="#block_sparse.symmetric_block_sparse" title="block_sparse.symmetric_block_sparse"><code class="xref py py-class docutils literal"><span class="pre">symmetric_block_sparse</span></code></a> matrix.</p>
+</div></blockquote>
+<p><strong>dtype</strong> : numpy data type object</p>
+<blockquote>
+<div><p>Set the default data type for the submatrices. Default <code class="xref py py-class docutils literal"><span class="pre">float32</span></code></p>
+</div></blockquote>
+<p><strong>row_names</strong> : <code class="xref py py-class docutils literal"><span class="pre">array</span></code></p>
+<blockquote>
+<div><p>numpy array with names of the row-blocks. Default <code class="xref py py-class docutils literal"><span class="pre">None</span></code></p>
+</div></blockquote>
+<p><strong>col_names</strong> : <code class="xref py py-class docutils literal"><span class="pre">array</span></code></p>
+<blockquote>
+<div><p>numpy array with names of the col-blocks. Default <code class="xref py py-class docutils literal"><span class="pre">None</span></code></p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><a class="reference internal" href="#block_sparse.symmetric_block_sparse" title="block_sparse.symmetric_block_sparse"><code class="xref py py-class docutils literal"><span class="pre">symmetric_block_sparse</span></code></a></p>
+<blockquote class="last">
+<div><p>block-sparse matrix</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#block_sparse.symmetric_block_sparse.add" title="block_sparse.symmetric_block_sparse.add"><code class="xref py py-obj docutils literal"><span class="pre">add</span></code></a>(A)</td>
+<td>Matrix addition of a matrix A to current matrix.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">dot</span></code>(A)</td>
+<td>Right multiply the current matrix with another <a class="reference internal" href="#module-block_sparse" title="block_sparse"><code class="xref py py-class docutils literal"><span class="pre">block_sparse</span></code></a> matrix, <a class="reference internal" href="#block_sparse.symmetric_block_sparse" title="block_sparse.symmetric_block_sparse"><code class="xref py py-class docutils literal"><span class="pre">symmetric_block_sparse</span></code></a> matrix, or <code class="xref py py-class docutils literal"><span class="pre">array</span></code>, A.</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">frobenius</span></code>(A)</td>
+<td>Compute the frobenius inner product between the current matrix and matrix A</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#block_sparse.symmetric_block_sparse.get_submatrix" title="block_sparse.symmetric_block_sparse.get_submatrix"><code class="xref py py-obj docutils literal"><span class="pre">get_submatrix</span></code></a>(block)</td>
+<td>Retrieve a particular block of the matrix</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#block_sparse.symmetric_block_sparse.get_type" title="block_sparse.symmetric_block_sparse.get_type"><code class="xref py py-obj docutils literal"><span class="pre">get_type</span></code></a>(block)</td>
+<td>Retrieve the type of a particular block of the matrix</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">norm</span></code>()</td>
+<td>Compute the frobenius norm of the current matrix</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#block_sparse.symmetric_block_sparse.qform" title="block_sparse.symmetric_block_sparse.qform"><code class="xref py py-obj docutils literal"><span class="pre">qform</span></code></a>(y[,&nbsp;z])</td>
+<td>Let X be the current <a class="reference internal" href="#block_sparse.symmetric_block_sparse" title="block_sparse.symmetric_block_sparse"><code class="xref py py-class docutils literal"><span class="pre">symmetric_block_sparse</span></code></a> matrix, and y and z column vectors.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#block_sparse.symmetric_block_sparse.to_dense" title="block_sparse.symmetric_block_sparse.to_dense"><code class="xref py py-obj docutils literal"><span class="pre">to_dense</span></code></a>()</td>
+<td>Return the current matrix as a standard (dense) numpy array</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#block_sparse.symmetric_block_sparse.transpose" title="block_sparse.symmetric_block_sparse.transpose"><code class="xref py py-obj docutils literal"><span class="pre">transpose</span></code></a>()</td>
+<td>Return the transpose of the symmetric block-sparse matrix</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="block_sparse.symmetric_block_sparse.add">
+<code class="descname">add</code><span class="sig-paren">(</span><em>A</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/block_sparse.html#symmetric_block_sparse.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#block_sparse.symmetric_block_sparse.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Matrix addition of a matrix A to current matrix.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>A</strong> : matrix</p>
+<blockquote>
+<div><p>matrix A with same dimensions as current matrix. The matrix A can be a <code class="xref py py-class docutils literal"><span class="pre">array</span></code>,
+<a class="reference internal" href="#module-block_sparse" title="block_sparse"><code class="xref py py-class docutils literal"><span class="pre">block_sparse</span></code></a> matrix, or <a class="reference internal" href="#block_sparse.symmetric_block_sparse" title="block_sparse.symmetric_block_sparse"><code class="xref py py-class docutils literal"><span class="pre">symmetric_block_sparse</span></code></a> matrix. It must have the same block
+structure as the current matrix if the matrix is a <a class="reference internal" href="#module-block_sparse" title="block_sparse"><code class="xref py py-class docutils literal"><span class="pre">block_sparse</span></code></a> matrix or <a class="reference internal" href="#block_sparse.symmetric_block_sparse" title="block_sparse.symmetric_block_sparse"><code class="xref py py-class docutils literal"><span class="pre">symmetric_block_sparse</span></code></a> matrix.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">matrix</p>
+<blockquote class="last">
+<div><p>If A is <a class="reference internal" href="#block_sparse.symmetric_block_sparse" title="block_sparse.symmetric_block_sparse"><code class="xref py py-class docutils literal"><span class="pre">symmetric_block_sparse</span></code></a>, returns a <a class="reference internal" href="#block_sparse.symmetric_block_sparse" title="block_sparse.symmetric_block_sparse"><code class="xref py py-class docutils literal"><span class="pre">symmetric_block_sparse</span></code></a> matrix. Otherwise, returns
+a <a class="reference internal" href="#module-block_sparse" title="block_sparse"><code class="xref py py-class docutils literal"><span class="pre">block_sparse</span></code></a> matrix.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="block_sparse.symmetric_block_sparse.get_submatrix">
+<code class="descname">get_submatrix</code><span class="sig-paren">(</span><em>block</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/block_sparse.html#symmetric_block_sparse.get_submatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#block_sparse.symmetric_block_sparse.get_submatrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve a particular block of the matrix</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>block</strong> : <code class="xref py py-class docutils literal"><span class="pre">tuple</span></code></p>
+<blockquote>
+<div><p>tuple (i,j) giving the index of the block</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">block</p>
+<blockquote class="last">
+<div><p>either a <code class="xref py py-class docutils literal"><span class="pre">array</span></code>, a <a class="reference internal" href="#module-block_sparse" title="block_sparse"><code class="xref py py-class docutils literal"><span class="pre">block_sparse</span></code></a> matrix, or a <a class="reference internal" href="#block_sparse.symmetric_block_sparse" title="block_sparse.symmetric_block_sparse"><code class="xref py py-class docutils literal"><span class="pre">symmetric_block_sparse</span></code></a> matrix.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="block_sparse.symmetric_block_sparse.get_type">
+<code class="descname">get_type</code><span class="sig-paren">(</span><em>block</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/block_sparse.html#symmetric_block_sparse.get_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#block_sparse.symmetric_block_sparse.get_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the type of a particular block of the matrix</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>block</strong> : <code class="xref py py-class docutils literal"><span class="pre">tuple</span></code></p>
+<blockquote>
+<div><p>tuple (i,j) giving the index of the block</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">block type</p>
+<blockquote class="last">
+<div><p>either <code class="xref py py-class docutils literal"><span class="pre">array</span></code>, <a class="reference internal" href="#module-block_sparse" title="block_sparse"><code class="xref py py-class docutils literal"><span class="pre">block_sparse</span></code></a> matrix, or <a class="reference internal" href="#block_sparse.symmetric_block_sparse" title="block_sparse.symmetric_block_sparse"><code class="xref py py-class docutils literal"><span class="pre">symmetric_block_sparse</span></code></a> matrix.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="block_sparse.symmetric_block_sparse.qform">
+<code class="descname">qform</code><span class="sig-paren">(</span><em>y</em>, <em>z=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/block_sparse.html#symmetric_block_sparse.qform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#block_sparse.symmetric_block_sparse.qform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Let X be the current <a class="reference internal" href="#block_sparse.symmetric_block_sparse" title="block_sparse.symmetric_block_sparse"><code class="xref py py-class docutils literal"><span class="pre">symmetric_block_sparse</span></code></a> matrix, and y and z column vectors. When it is defined, this computes the quadratic form y’Xz.
+If only y is provided, this computes the quadratic form y’Xy.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>y</strong> : <code class="xref py py-class docutils literal"><span class="pre">array</span></code></p>
+<blockquote>
+<div><blockquote>
+<div><p>1D numpy array of same length as number of rows of current matrix</p>
+</div></blockquote>
+<dl class="docutils">
+<dt>z <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">array</span></code></span></dt>
+<dd><p class="first last">1D numpy array of same length as number of rows of current matrix. Default <code class="xref py py-class docutils literal"><span class="pre">None</span></code>.</p>
+</dd>
+</dl>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></a></p>
+<blockquote class="last">
+<div><p>the value of the quadratic form y’Xz</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="block_sparse.symmetric_block_sparse.to_dense">
+<code class="descname">to_dense</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/block_sparse.html#symmetric_block_sparse.to_dense"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#block_sparse.symmetric_block_sparse.to_dense" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the current matrix as a standard (dense) numpy array</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">array</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="block_sparse.symmetric_block_sparse.transpose">
+<code class="descname">transpose</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/block_sparse.html#symmetric_block_sparse.transpose"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#block_sparse.symmetric_block_sparse.transpose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the transpose of the symmetric block-sparse matrix</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><a class="reference internal" href="#block_sparse.symmetric_block_sparse" title="block_sparse.symmetric_block_sparse"><code class="xref py py-class docutils literal"><span class="pre">symmetric_block_sparse</span></code></a></p>
+<blockquote class="last">
+<div><p>the current matrix, as it is symmetric</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="block_sparse.matmul">
+<code class="descclassname">block_sparse.</code><code class="descname">matmul</code><span class="sig-paren">(</span><em>X</em>, <em>A</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/block_sparse.html#matmul"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#block_sparse.matmul" title="Permalink to this definition">¶</a></dt>
+<dd><p>Matrix multiplication between <a class="reference internal" href="#module-block_sparse" title="block_sparse"><code class="xref py py-class docutils literal"><span class="pre">block_sparse</span></code></a> and <a class="reference internal" href="#block_sparse.symmetric_block_sparse" title="block_sparse.symmetric_block_sparse"><code class="xref py py-class docutils literal"><span class="pre">symmetric_block_sparse</span></code></a> matrices, as well
+as matrix multiplication between a <a class="reference internal" href="#module-block_sparse" title="block_sparse"><code class="xref py py-class docutils literal"><span class="pre">block_sparse</span></code></a> or <a class="reference internal" href="#block_sparse.symmetric_block_sparse" title="block_sparse.symmetric_block_sparse"><code class="xref py py-class docutils literal"><span class="pre">symmetric_block_sparse</span></code></a> matrix and an <code class="xref py py-class docutils literal"><span class="pre">array</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>X</strong> : matrix</p>
+<blockquote>
+<div><p>The matrix X can be a <a class="reference internal" href="#module-block_sparse" title="block_sparse"><code class="xref py py-class docutils literal"><span class="pre">block_sparse</span></code></a> matrix, a <a class="reference internal" href="#block_sparse.symmetric_block_sparse" title="block_sparse.symmetric_block_sparse"><code class="xref py py-class docutils literal"><span class="pre">symmetric_block_sparse</span></code></a> matrix, or a <code class="xref py py-class docutils literal"><span class="pre">array</span></code>.</p>
+</div></blockquote>
+<p><strong>A</strong> : matrix</p>
+<blockquote>
+<div><p>The matrix A can be a <a class="reference internal" href="#module-block_sparse" title="block_sparse"><code class="xref py py-class docutils literal"><span class="pre">block_sparse</span></code></a> matrix, a <a class="reference internal" href="#block_sparse.symmetric_block_sparse" title="block_sparse.symmetric_block_sparse"><code class="xref py py-class docutils literal"><span class="pre">symmetric_block_sparse</span></code></a> matrix, or a <code class="xref py py-class docutils literal"><span class="pre">array</span></code>.
+Note that the number of rows of A must match the number of columns of X. Furthermore, if X and A are both
+<a class="reference internal" href="#module-block_sparse" title="block_sparse"><code class="xref py py-class docutils literal"><span class="pre">block_sparse</span></code></a> or <a class="reference internal" href="#block_sparse.symmetric_block_sparse" title="block_sparse.symmetric_block_sparse"><code class="xref py py-class docutils literal"><span class="pre">symmetric_block_sparse</span></code></a>, then the column blocks of X must match the row blocks of A.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><a class="reference internal" href="#module-block_sparse" title="block_sparse"><code class="xref py py-class docutils literal"><span class="pre">block_sparse</span></code></a></p>
+<blockquote class="last">
+<div><p>the block-sparse matrix formed by matrix multiplication XA</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="block_sparse.dense_to_block_sparse">
+<code class="descclassname">block_sparse.</code><code class="descname">dense_to_block_sparse</code><span class="sig-paren">(</span><em>dense</em>, <em>blocks</em>, <em>symmetric</em>, <em>dtype=&lt;type 'numpy.float64'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/block_sparse.html#dense_to_block_sparse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#block_sparse.dense_to_block_sparse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a standard (dense) numpy array into a <a class="reference internal" href="#module-block_sparse" title="block_sparse"><code class="xref py py-class docutils literal"><span class="pre">block_sparse</span></code></a> or
+a <a class="reference internal" href="#block_sparse.symmetric_block_sparse" title="block_sparse.symmetric_block_sparse"><code class="xref py py-class docutils literal"><span class="pre">symmetric_block_sparse</span></code></a> matrix. Note this simply imposes a block structure onto
+the matrix so that it can interact with other block matrices. It does not take advantage
+of any sparsity in the input matrix.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dense</strong> : <code class="xref py py-class docutils literal"><span class="pre">array</span></code></p>
+<blockquote>
+<div><blockquote>
+<div><p>input matrix</p>
+</div></blockquote>
+<dl class="docutils">
+<dt>blocks <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">list</span></code></span></dt>
+<dd><p class="first last">list of [row_block_boundaries,col_block_boundaries], where each of row_block_boundaries and col_block_boundaries is
+a 1D <code class="xref py py-class docutils literal"><span class="pre">array</span></code> of integers, beginning with 0, followed by the end boundaries of each block in increasing order</p>
+</dd>
+<dt>symmetric <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">bool</span></code></a></span></dt>
+<dd><p class="first last">if True, returns a <a class="reference internal" href="#block_sparse.symmetric_block_sparse" title="block_sparse.symmetric_block_sparse"><code class="xref py py-class docutils literal"><span class="pre">symmetric_block_sparse</span></code></a> matrix; if False, returns a <a class="reference internal" href="#module-block_sparse" title="block_sparse"><code class="xref py py-class docutils literal"><span class="pre">block_sparse</span></code></a> matrix</p>
+</dd>
+<dt>dtype <span class="classifier-delimiter">:</span> <span class="classifier">numpy data type</span></dt>
+<dd><p class="first last">the default data type of the returned matrix</p>
+</dd>
+</dl>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">matrix</p>
+<blockquote class="last">
+<div><p>the current matrix as a <a class="reference internal" href="#module-block_sparse" title="block_sparse"><code class="xref py py-class docutils literal"><span class="pre">block_sparse</span></code></a> or a <a class="reference internal" href="#block_sparse.symmetric_block_sparse" title="block_sparse.symmetric_block_sparse"><code class="xref py py-class docutils literal"><span class="pre">symmetric_block_sparse</span></code></a> matrix</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">block_sparse</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Documentation for ‘block_sparse’ module</a><ul class="simple">
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="tutorial.html" title="previous chapter">Tutorial</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Alexander Thomas Ian Strudwick Young.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/block_sparse.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

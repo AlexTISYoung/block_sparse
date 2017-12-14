@@ -819,4 +819,3 @@ def matmul(X, A):
                     B_submatrices.append(B_ij)
 
     return block_sparse(B_blocks, B_nonzero, B_submatrices)
-
