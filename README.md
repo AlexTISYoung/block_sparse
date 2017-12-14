@@ -19,6 +19,8 @@ One can also convert a block_sparse or symmetric_block_sparse matrix into a 2D n
 # Installation
     
 # Documentation
+
+Documentation is available at http://block-sparse.readthedocs.io/en/latest/
     
 # Running tests
 
