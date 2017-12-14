@@ -1,7 +1,6 @@
 # block_sparse
-block_sparse is a python library for performing basic computations with 
+block_sparse is a python library for performing computations with 
 matrices with a (hierarchical) block-sparsity structure
-
 
 # Main features:
 

@@ -1,10 +1,32 @@
 import numpy as np
 
 class block_sparse(object):
-    """
-    A square matrix with block structure
-    """
+    """Define a block-sparse matrix
 
+    Parameters
+    ----------
+    blocks : :class:`list`
+        list of [row_block_boundaries,col_block_boundaries], where each of row_block_boundaries and col_block_boundaries is
+        a 1D :class:`~numpy:numpy.array` of integers, beginning with 0, followed by the end boundaries of each block in increasing order
+    nonzero : :class:`~numpy:numpy.array`
+        boolean numpy array with number of rows equal to number of row blocks, and number of columns equal to number of
+        col blocks. If entry [i,j] of nonzero is True, then the corresponding block is non-zero; if it is False, then the
+        corresponding block is zero.
+    submatrices : :class:`list`
+        list of submatrices for non-zero blocks in row-major order; e.g., block (1,1), (1,2), (2,1), (2,2),...
+        Each submatrix can be an :class:`~numpy:numpy.array`, a :class:`block_sparse` matrix, or a :class:`symmetric_block_sparse` matrix.
+    dtype : numpy data type object
+        Set the default data type for the submatrices. Default :class:`~numpy:numpy.float32`
+    row_names : :class:`~numpy:numpy.array`
+        numpy array with names of the row-blocks. Default :class:`None`
+    col_names : :class:`~numpy:numpy.array`
+        numpy array with names of the col-blocks. Default :class:`None`
+
+    Returns
+    -------
+    matrix : :class:`block_sparse`
+        block-sparse matrix
+    """
     def __init__(self, blocks, nonzero, submatrices, dtype=np.float32, row_names=None, col_names=None):
         # Block information
         if type(blocks) == list and len(blocks) == 2:
@@ -65,28 +87,57 @@ class block_sparse(object):
                                     submatrices[nonzero_count].shape[1]) + '. Expected ' + str(ij_shape[0]) + ',' + str(
                                     ij_shape[1])))
                 self.submatrices = submatrices
-                self.dtype = dtype
             else:
                 self.types = None
                 self.submatrices = None
                 self.submatrix_dict = None
-                self.dtype = dtype
+            self.dtype = dtype
         else:
             raise (ValueError('Number of submatrices does not match number of non-zero blocks'))
 
     def get_submatrix(self, block):
+        """Retrieve a particular block of the matrix
+
+            Parameters
+            ----------
+            block : :class:`tuple`
+                tuple (i,j) giving the index of the block
+
+            Returns
+            -------
+            block
+                either an :class:`~numpy:numpy.array`, a :class:`block_sparse` matrix, or a :class:`symmetric_block_sparse` matrix.
+        """
         if block in self.submatrix_dict:
             return self.submatrix_dict[block]
         else:
             return 0
 
     def get_type(self, block):
+        """Retrieve the type of a particular block of the matrix
+
+            Parameters
+            ----------
+            block : :class:`tuple`
+                tuple (i,j) giving the index of the block
+
+            Returns
+            -------
+            block type
+                either :class:`~numpy:numpy.array`, :class:`block_sparse`, or :class:`symmetric_block_sparse`.
+        """
         if block in self.types:
             return self.types[block]
         else:
             return None
 
     def transpose(self):
+        """Return the transpose of the block-sparse matrix
+
+            Returns
+            -------
+            :class:`block_sparse`
+        """
         if self.submatrices is None or np.sum(self.nonzero) == 0:
             return block_sparse([self.blocks[1], self.blocks[0]],
                                 np.zeros((self.n_blocks[1], self.n_blocks[0]), dtype=bool), [])
@@ -113,12 +164,27 @@ class block_sparse(object):
             return block_sparse([self.blocks[1], self.blocks[0]], self.nonzero.T, submatrix_list)
 
     def frobenius(self, A):
-        # Compute the frobenius inner product between the current matrix and matrix A
+        """Compute the frobenius inner product between the current matrix and matrix A
+
+            Parameters
+            ----------
+            A : matrix
+                matrix A with same dimensions as current matrix. The matrix A can be an :class:`~numpy:numpy.array`,
+                :class:`block_sparse` matrix, or :class:`symmetric_block_sparse` matrix. It must have the same block
+                structure as the current matrix if the matrix is a :class:`block_sparse` matrix or :class:`symmetric_block_sparse` matrix.
+
+            Returns
+            -------
+            :class:`float`
+                the frobenius inner product between the current matrix and matrix A
+        """
         # check blocks match
-        if not type(A) in [block_sparse, symmetric_block_sparse]:
-            raise (ValueError('Other matrix is not block_sparse'))
         if not self.shape == A.shape:
             raise (ValueError('Matrices do not have same shape'))
+        if type(A)==np.ndarray:
+            A = dense_to_block_sparse(A, self.blocks, False, dtype=A.dtype)
+        if not type(A) in [block_sparse, symmetric_block_sparse]:
+            raise (ValueError('Other matrix is not block_sparse, symmetric_block_sparse, or numpy array'))
         if not self.n_blocks[0] == A.n_blocks[0]:
             raise (ValueError('Matrices do not have same number of row blocks'))
         if not self.n_blocks[1] == A.n_blocks[1]:
@@ -129,7 +195,8 @@ class block_sparse(object):
                     pass
                 else:
                     raise (ValueError('Blocks do not align'))
-        frob = 0
+        # Compute Frobenius inner product
+        frob = 0.0
         if self.submatrices is not None:
             for i in xrange(0, self.n_blocks[0]):
                 for j in xrange(0, self.n_blocks[1]):
@@ -148,8 +215,32 @@ class block_sparse(object):
                                 frob += np.sum(self_ij * A_ij)
         return frob
 
+    def norm(self):
+        """Compute the frobenius norm of the current matrix
+
+            Returns
+            -------
+            :class:`float`
+                the frobenius norm of the current matrix
+        """
+        return self.frobenius(self)
+
     def add(self, A):
-        # Add a block-sparse matrix A to self
+        """Matrix addition of a matrix A to current matrix
+
+            Parameters
+            ----------
+            A : matrix
+                matrix A with same dimensions as current matrix. The matrix A can be an :class:`~numpy:numpy.array`,
+                :class:`block_sparse` matrix, or :class:`symmetric_block_sparse` matrix. It must have the same block
+                structure as the current matrix if the matrix is a :class:`block_sparse` matrix or :class:`symmetric_block_sparse` matrix.
+
+            Returns
+            -------
+            :class:`block_sparse`
+                the block-sparse matrix formed by matrix addition of the current matrix to A
+        """
+        #
         # matrix multiplication: B=self%*%A
         if not type(A) in [block_sparse, symmetric_block_sparse, np.ndarray]:
             raise (ValueError('Other matrix is not block_sparse or numpy array'))
@@ -204,72 +295,117 @@ class block_sparse(object):
 
             return block_sparse(self.blocks, B_nonzero, B_submatrices)
 
-    def __add__(self, other):
-        return self.add(other)
+    def __add__(self, A):
+        """Matrix addition of a matrix A to current matrix
 
-    def dot(self, A):
-        # matrix multiplication: B=self%*%A
-        if not type(A) in [block_sparse, symmetric_block_sparse]:
-            raise (ValueError('Other matrix is not block_sparse'))
-        if not self.n_blocks[1] == A.n_blocks[0]:
-            raise (ValueError('Number of col blocks of first matrix not equal to number of row blocks of second'))
-        for i in xrange(0, self.n_blocks[1]):
-            if not self.blocks[1][i] == A.blocks[0][i]:
-                raise (ValueError(
-                    'self col block boundary at ' + str(self.blocks[1][i]) + ' and A row block boundary at ' + str(
-                        A.blocks[0][i])))
-        if self.submatrices is None or np.sum(self.nonzero) == 0 or A.submatrices is None or np.sum(A.nonzero) == 0:
-            return block_sparse([self.blocks[0], A.blocks[1]], np.zeros((self.n_blocks[0], A.n_blocks[1]), dtype=bool),
-                                [])
-        if not self.dtype == A.dtype:
-            raise (Warning('Data types do not match: ' + str(self.dtype)))
-        else:
-            # Determine which blocks in product will be non-zero
-            B_nonzero = self.nonzero.dot(A.nonzero)
-            B_submatrices = list()
-            B_blocks = [self.blocks[0], A.blocks[1]]
-            for i in xrange(0, self.n_blocks[0]):
-                for j in xrange(0, A.n_blocks[1]):
-                    if B_nonzero[i, j]:
-                        # Identify if resulting i,j submatrix should be block sparse
-                        B_ij = np.zeros(
-                            (self.blocks[0][i + 1] - self.blocks[0][i], A.blocks[1][j + 1] - A.blocks[1][j]),
-                            dtype=self.dtype)
-                        for k in xrange(0, self.n_blocks[1]):
-                            if self.nonzero[i, k] and A.nonzero[k, j]:
-                                self_ik = self.get_submatrix((i, k))
-                                A_kj = A.get_submatrix((k, j))
-                                if type(self_ik) in [block_sparse, symmetric_block_sparse]:
-                                    if type(A_kj) not in [block_sparse, symmetric_block_sparse]:
-                                        A_kj = dense_to_block_sparse(A_kj, [self_ik.blocks[1], self_ik.blocks[0]],
-                                                                     False, dtype=A_kj.dtype)
-                                        B_ijk = self_ik.dot(A_kj)
-                                        B_ij = B_ijk.add(B_ij)
-                                    B_ijk = self_ik.dot(A_kj)
-                                    if not B_ijk.shape == B_ij.shape:
-                                        raise (ValueError(
-                                            'Block ' + str(i) + ',' + str(j) + ' should have shape ' + str(
-                                                self.blocks[0][i + 1] - self.blocks[0][i]) + ',' + str(
-                                                A.blocks[1][j + 1] - A.blocks[1][j]) + '.  B_ijk has shape ' + str(
-                                                B_ijk.shape[0]) + ',' + str(B_ijk.shape[1]) + ' k=' + str(
-                                                k) + ' i=' + str(i) + ' j=' + str(j) + ' self has shape ' + str(
-                                                self_ik.shape[0]) + ',' + str(self_ik.shape[1]) + ' A has shape ' + str(
-                                                A_kj.shape[0]) + ',' + str(A_kj.shape[1])))
-                                    B_ij = B_ijk.add(B_ij)
-                                else:
-                                    if type(A_kj) in [block_sparse, symmetric_block_sparse]:
-                                        self_ik = dense_to_block_sparse(self_ik, A_kj.blocks, False, dtype=A_kj.dtype)
-                                        B_ij = self_ik.dot(A_kj).add(B_ij)
-                                    else:
-                                        if type(B_ij) == np.ndarray:
-                                            B_ij += np.dot(self_ik, A_kj)
-                                        else:
-                                            B_ij = B_ij.add(np.dot(self_ik, A_kj))
-                        B_submatrices.append(B_ij)
+            Parameters
+            ----------
+            A : matrix
+                matrix A with same dimensions as current matrix. The matrix A can be a :class:`~numpy:numpy.array`,
+                :class:`block_sparse` matrix, or :class:`symmetric_block_sparse` matrix. It must have the same block
+                structure as the current matrix if the matrix is a :class:`block_sparse` matrix or :class:`symmetric_block_sparse` matrix.
 
-            return block_sparse(B_blocks, B_nonzero, B_submatrices)
+            Returns
+            -------
+            matrix  :class:`block_sparse`
+                the block-sparse matrix formed by matrix addition of the current matrix to A
+        """
+        return self.add(A)
+
+    def dot(self,A):
+        return matmul(self,A)
+
+    # def dot(self, A):
+    #     """Right multiply the current matrix with another :class:`block_sparse` matrix, or :class:`symmetric_block_sparse` matrix, A.
+    #
+    #         Parameters
+    #         ----------
+    #         A : matrix
+    #             matrix A with compatible dimensions and block structure: i.e. the row blocks of A must match the column blocks of the
+    #             current matrix. The matrix A can be a :class:`block_sparse` matrix, or a :class:`symmetric_block_sparse` matrix.
+    #
+    #         Returns
+    #         -------
+    #         :class:`block_sparse`
+    #             the block-sparse matrix formed by right multiplication of the current matrix by A
+    #     """
+    #     # matrix multiplication: B=self%*%A
+    #     if not type(A) in [block_sparse, symmetric_block_sparse]:
+    #         raise (ValueError('Other matrix is not block_sparse'))
+    #     if not self.n_blocks[1] == A.n_blocks[0]:
+    #         raise (ValueError('Number of col blocks of first matrix not equal to number of row blocks of second'))
+    #     for i in xrange(0, self.n_blocks[1]):
+    #         if not self.blocks[1][i] == A.blocks[0][i]:
+    #             raise (ValueError(
+    #                 'self col block boundary at ' + str(self.blocks[1][i]) + ' and A row block boundary at ' + str(
+    #                     A.blocks[0][i])))
+    #     if self.submatrices is None or np.sum(self.nonzero) == 0 or A.submatrices is None or np.sum(A.nonzero) == 0:
+    #         return block_sparse([self.blocks[0], A.blocks[1]], np.zeros((self.n_blocks[0], A.n_blocks[1]), dtype=bool),
+    #                             [])
+    #     if not self.dtype == A.dtype:
+    #         raise (Warning('Data types do not match: ' + str(self.dtype)))
+    #     else:
+    #         # Determine which blocks in product will be non-zero
+    #         B_nonzero = self.nonzero.dot(A.nonzero)
+    #         B_submatrices = list()
+    #         B_blocks = [self.blocks[0], A.blocks[1]]
+    #         for i in xrange(0, self.n_blocks[0]):
+    #             for j in xrange(0, A.n_blocks[1]):
+    #                 if B_nonzero[i, j]:
+    #                     # Identify if resulting i,j submatrix should be block sparse
+    #                     B_ij = np.zeros(
+    #                         (self.blocks[0][i + 1] - self.blocks[0][i], A.blocks[1][j + 1] - A.blocks[1][j]),
+    #                         dtype=self.dtype)
+    #                     for k in xrange(0, self.n_blocks[1]):
+    #                         if self.nonzero[i, k] and A.nonzero[k, j]:
+    #                             self_ik = self.get_submatrix((i, k))
+    #                             A_kj = A.get_submatrix((k, j))
+    #                             if type(self_ik) in [block_sparse, symmetric_block_sparse]:
+    #                                 if type(A_kj) not in [block_sparse, symmetric_block_sparse]:
+    #                                     A_kj = dense_to_block_sparse(A_kj, [self_ik.blocks[1], self_ik.blocks[0]],
+    #                                                                  False, dtype=A_kj.dtype)
+    #                                     B_ijk = self_ik.dot(A_kj)
+    #                                     B_ij = B_ijk.add(B_ij)
+    #                                 B_ijk = self_ik.dot(A_kj)
+    #                                 if not B_ijk.shape == B_ij.shape:
+    #                                     raise (ValueError(
+    #                                         'Block ' + str(i) + ',' + str(j) + ' should have shape ' + str(
+    #                                             self.blocks[0][i + 1] - self.blocks[0][i]) + ',' + str(
+    #                                             A.blocks[1][j + 1] - A.blocks[1][j]) + '.  B_ijk has shape ' + str(
+    #                                             B_ijk.shape[0]) + ',' + str(B_ijk.shape[1]) + ' k=' + str(
+    #                                             k) + ' i=' + str(i) + ' j=' + str(j) + ' self has shape ' + str(
+    #                                             self_ik.shape[0]) + ',' + str(self_ik.shape[1]) + ' A has shape ' + str(
+    #                                             A_kj.shape[0]) + ',' + str(A_kj.shape[1])))
+    #                                 B_ij = B_ijk.add(B_ij)
+    #                             else:
+    #                                 if type(A_kj) in [block_sparse, symmetric_block_sparse]:
+    #                                     self_ik = dense_to_block_sparse(self_ik, A_kj.blocks, False, dtype=A_kj.dtype)
+    #                                     B_ij = self_ik.dot(A_kj).add(B_ij)
+    #                                 else:
+    #                                     if type(B_ij) == np.ndarray:
+    #                                         B_ij += np.dot(self_ik, A_kj)
+    #                                     else:
+    #                                         B_ij = B_ij.add(np.dot(self_ik, A_kj))
+    #                     B_submatrices.append(B_ij)
+    #
+    #         return block_sparse(B_blocks, B_nonzero, B_submatrices)
 
     def qform(self, y, z=None):
+        """Computes quadratic form defined by current matrix and input vectors. Let X be the current :class:`block_sparse` matrix, and y and z column vectors. When it is defined, this computes the quadratic form y'Xz.
+           If only y is provided, this computes the quadratic form y'Xy.
+
+            Parameters
+            ----------
+            y : :class:`~numpy:numpy.array`
+                1D numpy array of same length as number of rows of current matrix
+            z : :class:`~numpy:numpy.array`
+                1D numpy array of same length as number of rows of current matrix. Default :class:`None`.
+
+            Returns
+            -------
+            :class:`float`
+                the value of the quadratic form y'Xz
+        """
         #### Compute inner product y'self y
         # check dimensions
         if self.submatrices is None or np.sum(self.nonzero) == 0:
@@ -294,6 +430,12 @@ class block_sparse(object):
                 raise (ValueError('y shape does not match matrix shape'))
 
     def to_dense(self):
+        """Return the current matrix as a standard (dense) numpy array
+
+            Returns
+            -------
+            :class:`~numpy:numpy.array`
+        """
         out = np.zeros(self.shape, dtype=self.dtype)
         if self.submatrices is None or np.sum(self.nonzero) == 0:
             return out
@@ -311,6 +453,30 @@ class block_sparse(object):
 
 
 class symmetric_block_sparse(block_sparse):
+    """Define a symmetric block-sparse matrix. Inherits some methods from :class:`block_sparse`.
+
+    Parameters
+    ----------
+    blocks : :class:`~numpy:numpy.array`
+        1D numpy integer array, starting at zero, followed by block boundaries, which are the same for both rows and columns
+    nonzero : :class:`~numpy:numpy.array`
+        symmetric boolean numpy array with number of rows equal to number of row blocks, which is equal to the number of col blocks.
+        If entry [i,j] of nonzero is True, then the corresponding block is non-zero; if it is False, then the corresponding block is zero.
+    submatrices : :class:`list`
+        list of submatrices for non-zero blocks in row-major order, ignoring lower-triangular blocks; e.g., block (1,1), (1,2), (2,2),...
+        Each submatrix can be a :class:`~numpy:numpy.array`, a :class:`block_sparse` matrix, or a :class:`symmetric_block_sparse` matrix.
+    dtype : numpy data type object
+        Set the default data type for the submatrices. Default :class:`~numpy:numpy.float32`
+    row_names : :class:`~numpy:numpy.array`
+        numpy array with names of the row-blocks. Default :class:`None`
+    col_names : :class:`~numpy:numpy.array`
+        numpy array with names of the col-blocks. Default :class:`None`
+
+    Returns
+    -------
+    :class:`symmetric_block_sparse`
+        block-sparse matrix
+    """
     def __init__(self, blocks, nonzero, submatrices, dtype=np.float32, row_names=None, col_names=None):
         # Block information
         if blocks.dtype == int and len(blocks.shape) == 1:
@@ -322,7 +488,7 @@ class symmetric_block_sparse(block_sparse):
             self.n_blocks.append(blocks.shape[0] - 1)
             self.shape = (self.blocks[0][self.n_blocks[0]], self.blocks[1][self.n_blocks[1]])
         else:
-            raise (ValueError('block boundaries must be given as a list of 1D numpy integer arrays'))
+            raise (ValueError('block boundaries must a 1D numpy integer array'))
         # non-zero submatrix information
         if row_names is not None:
             if not row_names.shape[0] == self.shape[0]:
@@ -379,6 +545,18 @@ class symmetric_block_sparse(block_sparse):
             raise (ValueError('Number of submatrices does not match number of non-zero blocks'))
 
     def get_submatrix(self, block):
+        """Retrieve a particular block of the matrix
+
+            Parameters
+            ----------
+            block : :class:`tuple`
+                tuple (i,j) giving the index of the block
+
+            Returns
+            -------
+            block
+                either a :class:`~numpy:numpy.array`, a :class:`block_sparse` matrix, or a :class:`symmetric_block_sparse` matrix.
+        """
         if block in self.submatrix_dict:
             return self.submatrix_dict[block]
         elif (block[1], block[0]) in self.submatrix_dict:
@@ -387,6 +565,18 @@ class symmetric_block_sparse(block_sparse):
             return 0
 
     def get_type(self, block):
+        """Retrieve the type of a particular block of the matrix
+
+            Parameters
+            ----------
+            block : :class:`tuple`
+                tuple (i,j) giving the index of the block
+
+            Returns
+            -------
+            block type
+                either :class:`~numpy:numpy.array`, :class:`block_sparse` matrix, or :class:`symmetric_block_sparse` matrix.
+        """
         if block in self.types:
             return self.types[block]
         elif (block[1], block[0]) in self.types:
@@ -395,8 +585,21 @@ class symmetric_block_sparse(block_sparse):
             return None
 
     def add(self, A):
-        # Add a block-sparse matrix A to self
-        # matrix multiplication: B=self%*%A
+        """Matrix addition of a matrix A to current matrix.
+
+            Parameters
+            ----------
+            A : matrix
+                matrix A with same dimensions as current matrix. The matrix A can be a :class:`~numpy:numpy.array`,
+                :class:`block_sparse` matrix, or :class:`symmetric_block_sparse` matrix. It must have the same block
+                structure as the current matrix if the matrix is a :class:`block_sparse` matrix or :class:`symmetric_block_sparse` matrix.
+
+            Returns
+            -------
+            matrix
+                If A is :class:`symmetric_block_sparse`, returns a :class:`symmetric_block_sparse` matrix. Otherwise, returns
+                a :class:`block_sparse` matrix.
+        """
         if not type(A) in [block_sparse, symmetric_block_sparse, np.ndarray]:
             raise (ValueError('Other matrix is not block_sparse or numpy array'))
         if not self.shape == A.shape:
@@ -454,12 +657,25 @@ class symmetric_block_sparse(block_sparse):
 
             return symmetric_block_sparse(self.blocks[0], B_nonzero, B_submatrices)
 
-    def __radd__(self, A):
+    def __add__(self, A):
         return self.add(A)
 
     def qform(self, y, z=None):
-        #### Compute inner product y'self y
-        # check dimensions
+        """Let X be the current :class:`symmetric_block_sparse` matrix, and y and z column vectors. When it is defined, this computes the quadratic form y'Xz.
+           If only y is provided, this computes the quadratic form y'Xy.
+
+            Parameters
+            ----------
+            y : :class:`~numpy:numpy.array`
+                1D numpy array of same length as number of rows of current matrix
+            z : :class:`~numpy:numpy.array`
+                1D numpy array of same length as number of rows of current matrix. Default :class:`None`.
+
+            Returns
+            -------
+            :class:`float`
+                the value of the quadratic form y'Xz
+        """
         if self.submatrices is None or np.sum(self.nonzero) == 0:
             return 0
         else:
@@ -486,9 +702,22 @@ class symmetric_block_sparse(block_sparse):
                 raise (ValueError('y shape does not match matrix shape'))
 
     def transpose(self):
+        """Return the transpose of the symmetric block-sparse matrix
+
+            Returns
+            -------
+            :class:`symmetric_block_sparse`
+                the current matrix, as it is symmetric
+        """
         return self
 
     def to_dense(self):
+        """Return the current matrix as a standard (dense) numpy array
+
+            Returns
+            -------
+            :class:`~numpy:numpy.array`
+        """
         out = np.zeros(self.shape, dtype=self.dtype)
         if self.submatrices is None or np.sum(self.nonzero) == 0:
             return out
@@ -517,6 +746,28 @@ class symmetric_block_sparse(block_sparse):
 
 
 def dense_to_block_sparse(dense, blocks, symmetric, dtype=np.float64):
+    """Convert a standard (dense) numpy array into a :class:`block_sparse` or
+       a :class:`symmetric_block_sparse` matrix. Note this simply imposes a block structure onto
+       the matrix so that it can interact with other block matrices. It does not take advantage
+       of any sparsity in the input matrix.
+
+        Parameters
+        ----------
+        dense : :class:`~numpy:numpy.array`
+            input matrix
+        blocks : :class:`list`
+            list of [row_block_boundaries,col_block_boundaries], where each of row_block_boundaries and col_block_boundaries is
+            a 1D :class:`~numpy:numpy.array` of integers, beginning with 0, followed by the end boundaries of each block in increasing order
+        symmetric : :class:`bool`
+            if True, returns a :class:`symmetric_block_sparse` matrix; if False, returns a :class:`block_sparse` matrix
+        dtype : numpy data type
+            the default data type of the returned matrix
+
+        Returns
+        -------
+        matrix
+            the current matrix as a :class:`block_sparse` or a :class:`symmetric_block_sparse` matrix
+    """
     n_row_blocks = blocks[0].shape[0] - 1
     n_col_blocks = blocks[0].shape[0] - 1
     if not blocks[0][n_row_blocks] == dense.shape[0]:
@@ -538,3 +789,95 @@ def dense_to_block_sparse(dense, blocks, symmetric, dtype=np.float64):
         return symmetric_block_sparse(blocks[0], nonzero, submatrices, dtype=dtype)
     else:
         return block_sparse(blocks, nonzero, submatrices, dtype=dtype)
+
+def matmul(X, A):
+    """Matrix multiplication between :class:`block_sparse` and :class:`symmetric_block_sparse` matrices, as well
+        as :class:`~numpy:numpy.array`.
+
+        Parameters
+        ----------
+        X : matrix
+            The matrix X can be a :class:`block_sparse` matrix, a :class:`symmetric_block_sparse` matrix, or a :class:`~numpy:numpy.array`.
+
+        A : matrix
+            The matrix A can be a :class:`block_sparse` matrix, a :class:`symmetric_block_sparse` matrix, or a :class:`~numpy:numpy.array`.
+            Note that the number of rows of A must match the number of columns of X. Furthermore, if X and A are both
+            :class:`block_sparse` or :class:`symmetric_block_sparse`, then the column blocks of X must match the row blocks of A.
+
+        Returns
+        -------
+        :class:`block_sparse`
+            the block-sparse matrix formed by matrix multiplication XA
+    """
+    if not X.shape[1]==A.shape[0]:
+        raise(ValueError('Matrices have incompatible dimensions'))
+    if type(A)==np.ndarray and type(X)==np.ndarray:
+        return np.dot(X,A)
+    elif type(A)==np.ndarray and type(X) in [block_sparse, symmetric_block_sparse]:
+        A_blocks = [X.blocks[1],np.array(0,A.shape[1],dtype=int)]
+        A = dense_to_block_sparse(A, A_blocks, False, dtype = A.dtype)
+    elif type(X)==np.ndarray and type(A) in [block_sparse, symmetric_block_sparse]:
+        X_blocks = [np.array(0,X.shape[0],dtype=int),A.blocks[0]]
+        X = dense_to_block_sparse(X, X_blocks, False, dtype = X.dtype)
+    elif type(X) in [block_sparse, symmetric_block_sparse] and type(A) in [block_sparse, symmetric_block_sparse]:
+        pass
+    else:
+        raise(ValueError('Usupported matrix types'))
+    # Check block structure matches
+    for i in xrange(0, X.n_blocks[1]):
+        if not X.blocks[1][i] == A.blocks[0][i]:
+            raise (ValueError(
+                'X col block boundary at ' + str(X.blocks[1][i]) + ' and A row block boundary at ' + str(
+                    A.blocks[0][i])))
+    if X.submatrices is None or np.sum(X.nonzero) == 0 or A.submatrices is None or np.sum(A.nonzero) == 0:
+        return block_sparse([X.blocks[0], A.blocks[1]], np.zeros((X.n_blocks[0], A.n_blocks[1]), dtype=bool),
+                            [])
+    # Compute dot product
+    if not X.dtype == A.dtype:
+        raise (Warning('Data types do not match: ' + str(X.dtype)))
+    else:
+        # Determine which blocks in product will be non-zero
+        B_nonzero = X.nonzero.dot(A.nonzero)
+        B_submatrices = list()
+        B_blocks = [X.blocks[0], A.blocks[1]]
+        for i in xrange(0, X.n_blocks[0]):
+            for j in xrange(0, A.n_blocks[1]):
+                if B_nonzero[i, j]:
+                    # Identify if resulting i,j submatrix should be block sparse
+                    B_ij = np.zeros(
+                        (X.blocks[0][i + 1] - X.blocks[0][i], A.blocks[1][j + 1] - A.blocks[1][j]),
+                        dtype=X.dtype)
+                    for k in xrange(0, X.n_blocks[1]):
+                        if X.nonzero[i, k] and A.nonzero[k, j]:
+                            X_ik = X.get_submatrix((i, k))
+                            A_kj = A.get_submatrix((k, j))
+                            if type(X_ik) in [block_sparse, symmetric_block_sparse]:
+                                if type(A_kj) not in [block_sparse, symmetric_block_sparse]:
+                                    A_kj = dense_to_block_sparse(A_kj, [X_ik.blocks[1], X_ik.blocks[0]],
+                                                                 False, dtype=A_kj.dtype)
+                                    B_ijk = X_ik.dot(A_kj)
+                                    B_ij = B_ijk.add(B_ij)
+                                B_ijk = X_ik.dot(A_kj)
+                                if not B_ijk.shape == B_ij.shape:
+                                    raise (ValueError(
+                                        'Block ' + str(i) + ',' + str(j) + ' should have shape ' + str(
+                                            X.blocks[0][i + 1] - X.blocks[0][i]) + ',' + str(
+                                            A.blocks[1][j + 1] - A.blocks[1][j]) + '.  B_ijk has shape ' + str(
+                                            B_ijk.shape[0]) + ',' + str(B_ijk.shape[1]) + ' k=' + str(
+                                            k) + ' i=' + str(i) + ' j=' + str(j) + ' X has shape ' + str(
+                                            X_ik.shape[0]) + ',' + str(X_ik.shape[1]) + ' A has shape ' + str(
+                                            A_kj.shape[0]) + ',' + str(A_kj.shape[1])))
+                                B_ij = B_ijk.add(B_ij)
+                            else:
+                                if type(A_kj) in [block_sparse, symmetric_block_sparse]:
+                                    X_ik = dense_to_block_sparse(X_ik, A_kj.blocks, False, dtype=A_kj.dtype)
+                                    B_ij = X_ik.dot(A_kj).add(B_ij)
+                                else:
+                                    if type(B_ij) == np.ndarray:
+                                        B_ij += np.dot(X_ik, A_kj)
+                                    else:
+                                        B_ij = B_ij.add(np.dot(X_ik, A_kj))
+                    B_submatrices.append(B_ij)
+
+    return block_sparse(B_blocks, B_nonzero, B_submatrices)
+
